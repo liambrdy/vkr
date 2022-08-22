@@ -137,6 +137,171 @@ void GetCommandBufferAllocInfo(VkCommandBufferAllocateInfo *info, VkCommandPool 
     info->level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 }
 
+void GetShaderModuleCreateInfo(VkShaderModuleCreateInfo *info, const std::vector<uint32_t> &code) {
+    info->sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->codeSize = code.size() * sizeof(uint32_t);
+    info->pCode = code.data();
+}
+
+void GetPipelineLayoutCreateInfo(VkPipelineLayoutCreateInfo *info, const std::vector<VkPushConstantRange> &pushConstants, const std::vector<VkDescriptorSetLayout> &layouts) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->pushConstantRangeCount = pushConstants.size();
+    info->pPushConstantRanges = pushConstants.data();
+    info->setLayoutCount = layouts.size();;
+    info->pSetLayouts = layouts.data();
+}
+
+void GetPipelineCacheCreateInfo(VkPipelineCacheCreateInfo *info) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->initialDataSize = 0;
+    info->pInitialData = nullptr;
+}
+
+void GetGraphicsPipelineCreateInfo(VkGraphicsPipelineCreateInfo *info) {
+    static VkPipelineMultisampleStateCreateInfo multisampleState;
+    GetPipelineMultisampleStateCreateInfo(&multisampleState);
+
+    static VkPipelineDepthStencilStateCreateInfo depthStencilState;
+    GetPipelineDepthStencilStateCreateInfo(&depthStencilState);
+
+    static VkPipelineColorBlendStateCreateInfo blendState;
+    GetPipelineColorBlendStateCreateInfo(&blendState);
+
+    info->sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->pTessellationState = nullptr;
+    info->pMultisampleState = &multisampleState;
+    info->pDepthStencilState = &depthStencilState;
+    info->pColorBlendState = &blendState;
+    info->basePipelineHandle = VK_NULL_HANDLE;
+    info->basePipelineIndex = 0;
+}
+
+void GetPipelineShaderStageCreateInfo(VkPipelineShaderStageCreateInfo *info, VkShaderModule mod, VkShaderStageFlagBits stage) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->stage = stage;
+    info->module = mod;
+    info->pName = "main";
+    info->pSpecializationInfo = nullptr;
+}
+
+void GetPipelineVertexInputStageCreateInfo(VkPipelineVertexInputStateCreateInfo *info, const std::vector<VkVertexInputBindingDescription> &bindings, const std::vector<VkVertexInputAttributeDescription> &attributes) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->vertexBindingDescriptionCount = bindings.size();
+    info->pVertexBindingDescriptions = bindings.data();
+    info->vertexAttributeDescriptionCount = attributes.size();
+    info->pVertexAttributeDescriptions = attributes.data();
+}
+
+void GetPipelineInputAssemblyStateCreateInfo(VkPipelineInputAssemblyStateCreateInfo *info, VkPrimitiveTopology topology) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->topology = topology;
+    info->primitiveRestartEnable = VK_FALSE;
+}
+
+void GetPipelineTessellationStateCreateInfo(VkPipelineTessellationStateCreateInfo *info, uint32_t points) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->patchControlPoints = points;
+}
+
+void GetPipelineViewportStateCreateInfo(VkPipelineViewportStateCreateInfo *info, const VkViewport *viewport, const VkRect2D *scissor) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->viewportCount = 1;
+    info->pViewports = viewport;
+    info->scissorCount = 1;
+    info->pScissors = scissor;
+}
+
+void GetPipelineRasterizationStateCreateInfo(VkPipelineRasterizationStateCreateInfo *info, VkPolygonMode polygonMode, VkCullModeFlags cullMode, float lineWidth) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->depthClampEnable = VK_FALSE;
+    info->rasterizerDiscardEnable = VK_FALSE;
+    info->polygonMode = polygonMode;
+    info->cullMode = cullMode;
+    info->frontFace = VK_FRONT_FACE_CLOCKWISE;
+    info->depthBiasEnable = VK_FALSE;
+    info->depthBiasConstantFactor = 0.0f;
+    info->depthBiasClamp = 0.0f;
+    info->depthBiasSlopeFactor = 0.0f;
+    info->lineWidth = lineWidth;
+}
+
+void GetPipelineMultisampleStateCreateInfo(VkPipelineMultisampleStateCreateInfo *info) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    info->sampleShadingEnable = VK_FALSE;
+    info->minSampleShading = 0.0f;
+    info->pSampleMask = nullptr;
+    info->alphaToCoverageEnable = VK_FALSE;
+    info->alphaToOneEnable = VK_FALSE;
+}
+
+void GetPipelineDepthStencilStateCreateInfo(VkPipelineDepthStencilStateCreateInfo *info) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->depthTestEnable = VK_TRUE;
+    info->depthWriteEnable = VK_TRUE;
+    info->depthCompareOp = VK_COMPARE_OP_LESS;
+    info->depthBoundsTestEnable = VK_FALSE;
+    info->stencilTestEnable = VK_FALSE;
+    info->minDepthBounds = 0.0f;
+    info->maxDepthBounds = 0.0f;
+}
+
+void GetPipelineColorBlendStateCreateInfo(VkPipelineColorBlendStateCreateInfo *info) {
+    static VkPipelineColorBlendAttachmentState attachment;
+    attachment.blendEnable = VK_TRUE;
+    attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    attachment.colorBlendOp = VK_BLEND_OP_ADD;
+    attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+    attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->logicOpEnable = VK_FALSE;
+    info->logicOp = VK_LOGIC_OP_COPY;
+    info->attachmentCount = 1;
+    info->pAttachments = &attachment;
+    info->blendConstants[0] = 0.0f;
+    info->blendConstants[1] = 0.0f;
+    info->blendConstants[2] = 0.0f;
+    info->blendConstants[3] = 0.0f;
+}
+
+void GetPipelineDynamicStateCreateInfo(VkPipelineDynamicStateCreateInfo *info, const std::vector<VkDynamicState> &states) {
+    info->sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    info->pNext = nullptr;
+    info->flags = 0;
+    info->dynamicStateCount = states.size();
+    info->pDynamicStates = states.data();
+}
+
 void GetAttachmentDescription(VkAttachmentDescription *description, VkFormat format, VkImageLayout initialLayout, VkImageLayout finalLayout) {
     description->flags = 0;
     description->format = format;
@@ -229,4 +394,14 @@ VkCommandBuffer CreateCommandBuffer(VkCommandPool pool) {
     VkCheck(vkAllocateCommandBuffers(context.device, &info, &cmd));
 
     return cmd;
+}
+
+VkShaderModule CreateShaderModule(const std::vector<uint32_t> &code) {
+    VkShaderModuleCreateInfo moduleInfo;
+    GetShaderModuleCreateInfo(&moduleInfo, code);
+
+    VkShaderModule mod;
+    VkCheck(vkCreateShaderModule(context.device, &moduleInfo, nullptr, &mod));
+
+    return mod;
 }

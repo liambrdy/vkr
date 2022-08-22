@@ -2,6 +2,7 @@
 #define CONTEXT_H_
 
 #include <volk.h>
+#include <vk_mem_alloc.h>
 
 #include <GLFW/glfw3.h>
 
@@ -26,6 +27,8 @@ struct Context {
     VkDevice device;
     VkQueue queue;
     VkSurfaceKHR surface;
+
+    VmaAllocator allocator;
 
     uint32_t imageIndex;
     Swapchain swapchain;

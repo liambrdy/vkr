@@ -1,3 +1,9 @@
 [submodule "deps/volk"]
 	path = deps/volk
 	url = https://github.com/zeux/volk
+[submodule "deps/VulkanMemoryAllocator"]
+	path = deps/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+[submodule "deps/SPIRV-Reflect"]
+	path = deps/SPIRV-Reflect
+	url = https://github.com/KhronosGroup/SPIRV-Reflect

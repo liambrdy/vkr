@@ -82,6 +82,7 @@ void InitializeVulkanContext(GLFWwindow *window) {
     VkPhysicalDeviceFeatures features = {};
     features.samplerAnisotropy = VK_TRUE;
     features.wideLines = VK_TRUE;
+    features.fillModeNonSolid = VK_TRUE;
     std::vector<const char *> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
     GetDeviceCreateInfo(&deviceCreateInfo, deviceExtensions, &features);
     GetQueueCreateInfo(&queueCreateInfo);
@@ -93,6 +94,43 @@ void InitializeVulkanContext(GLFWwindow *window) {
     volkLoadDevice(context.device);
 
     vkGetDeviceQueue(context.device, 0, 0, &context.queue);
+
+    VmaVulkanFunctions functions = {};
+    functions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+    functions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
+    functions.vkGetPhysicalDeviceProperties = vkGetPhysicalDeviceProperties;
+    functions.vkGetPhysicalDeviceMemoryProperties = vkGetPhysicalDeviceMemoryProperties;
+    functions.vkAllocateMemory = vkAllocateMemory;
+    functions.vkFreeMemory = vkFreeMemory;
+    functions.vkMapMemory = vkMapMemory;
+    functions.vkUnmapMemory = vkUnmapMemory;
+    functions.vkFlushMappedMemoryRanges = vkFlushMappedMemoryRanges;
+    functions.vkInvalidateMappedMemoryRanges = vkInvalidateMappedMemoryRanges;
+    functions.vkBindBufferMemory = vkBindBufferMemory;
+    functions.vkBindImageMemory = vkBindImageMemory;
+    functions.vkGetBufferMemoryRequirements = vkGetBufferMemoryRequirements;
+    functions.vkGetImageMemoryRequirements = vkGetImageMemoryRequirements;
+    functions.vkCreateBuffer = vkCreateBuffer;
+    functions.vkCreateImage = vkCreateImage;
+    functions.vkDestroyImage = vkDestroyImage;
+    functions.vkDestroyBuffer = vkDestroyBuffer;
+    functions.vkCmdCopyBuffer = vkCmdCopyBuffer;
+    functions.vkGetDeviceBufferMemoryRequirements = vkGetDeviceBufferMemoryRequirements;
+    functions.vkGetDeviceImageMemoryRequirements = vkGetDeviceImageMemoryRequirements;
+    functions.vkGetBufferMemoryRequirements2KHR = vkGetBufferMemoryRequirements2;
+    functions.vkGetImageMemoryRequirements2KHR = vkGetImageMemoryRequirements2;
+    functions.vkBindBufferMemory2KHR = vkBindBufferMemory2;
+    functions.vkBindImageMemory2KHR = vkBindImageMemory2;
+
+    VmaAllocatorCreateInfo allocatorInfo = {};
+    allocatorInfo.flags = 0;
+    allocatorInfo.physicalDevice = context.physicalDevice;
+    allocatorInfo.device = context.device;
+    allocatorInfo.pVulkanFunctions = &functions;
+    allocatorInfo.instance = context.instance;
+    allocatorInfo.vulkanApiVersion = appInfo.apiVersion;
+
+    VkCheck(vmaCreateAllocator(&allocatorInfo, &context.allocator));
 
     SwapchainCreate(&context.swapchain, window, true);
 
@@ -159,6 +197,8 @@ void ShutdownVulkanContext() {
     vkDestroyRenderPass(context.device, context.renderPass, nullptr);
 
     SwapchainDestroy(&context.swapchain);
+
+    vmaDestroyAllocator(context.allocator);
 
     vkDestroyDevice(context.device, nullptr);
     vkDestroySurfaceKHR(context.instance, context.surface, nullptr);
